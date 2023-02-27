@@ -1,0 +1,4 @@
+Square: 45.0
+Largest shape: Square (45)
+Most frequent shape: None (0)
+Average time to draw shapes: 60.0 seconds
