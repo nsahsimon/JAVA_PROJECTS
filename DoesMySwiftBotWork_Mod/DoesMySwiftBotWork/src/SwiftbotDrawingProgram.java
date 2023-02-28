@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Scanner;
 
+import swiftbot.SwiftBotAPI;
+import swiftbot.SwiftBotAPI.ImageSize;
+import swiftbot.SwiftBotAPI.Underlight;
+
 public class SwiftbotDrawingProgram {
     private static final int MIN_LENGTH = 15;
     private static final int MAX_LENGTH = 85;
@@ -13,8 +17,9 @@ public class SwiftbotDrawingProgram {
     private static final double EPSILON = 0.00001;
     private static final double WHEEL_RADIUS = 2.5;
     private static final double WHEEL_DISTANCE = 15.0;
-    private static final double LOW_SPEED = 3;
-    private static final double HIGH_SPEED = 0.6;
+    private static final double LOW_SPEED = 50; 
+    private static final double HIGH_SPEED = 100; 
+    private static final double SPEED_FACTOR = 0.34; // Proportionality factor that converts the speed of the wheels to rotations per minute (rpm)
 
     private static final ArrayList<String> DRAWN_SHAPES = new ArrayList<>();
     private static int squareCount = 0;
@@ -26,9 +31,23 @@ public class SwiftbotDrawingProgram {
     private static String mostFrequentShape = "";
 
     private static Scanner scanner = new Scanner(System.in);
+    static SwiftBotAPI swiftBot;
 
 
     public static void main(String[] args) {
+
+        try {
+			swiftBot = new SwiftBotAPI();
+		} catch (Exception e) {
+			/*
+			 * Outputs a warning if I2C is disabled. This only needs to be turned on once,
+			 * so you won't need to worry about this problem again!
+			 */
+			System.out.println("\nI2C disabled!");
+			System.out.println("Run the following command:");
+			System.out.println("sudo raspi-config nonint do_i2c 0\n");
+			System.exit(0);
+		}
 
         boolean quit = false;
         while (!quit) {
@@ -74,6 +93,13 @@ public class SwiftbotDrawingProgram {
         
         // Move the wheels at low speed for the calculated time to draw the square
         // Swiftbot.moveWheels(LOW_SPEED, LOW_SPEED, (int) (time * 1000));
+        moveWheelsFwd((int)time, (int)LOW_SPEED);
+        rotateSwitftbot(90, (int)LOW_SPEED);
+        moveWheelsFwd((int)time, (int)LOW_SPEED);
+        rotateSwitftbot(90, (int)LOW_SPEED);
+        moveWheelsFwd((int)time, (int)LOW_SPEED);
+        rotateSwitftbot(90, (int)LOW_SPEED);
+        moveWheelsFwd((int)time, (int)LOW_SPEED);
         
         // Update the DRAWN_SHAPES, largestSize, and largestShape variables
         DRAWN_SHAPES.add("Square: " + sideLength);
@@ -133,6 +159,13 @@ public class SwiftbotDrawingProgram {
         System.out.println("Moving wheels forward at low speed...");
         System.out.println("Turning wheels to make a left turn...");
         System.out.println("Moving wheels forward at low speed...");
+
+        moveWheelsFwd((int)calculateTime(side1 , LOW_SPEED) * 1000, (int)LOW_SPEED);
+        rotateSwitftbot(angle3, (int)LOW_SPEED);
+        moveWheelsFwd((int)calculateTime(side2 , LOW_SPEED) * 1000, (int)LOW_SPEED);
+        rotateSwitftbot(angle1, (int)LOW_SPEED);
+        moveWheelsFwd((int)calculateTime(side3 , LOW_SPEED) * 1000, (int)LOW_SPEED);
+        
         System.out.println("Stopping wheels and turning underlights to green...");
         System.out.println("Triangle drawn.");
         System.out.println();
@@ -262,10 +295,11 @@ public class SwiftbotDrawingProgram {
     }
     
     private static double calculateTime(double distance, double speed) {
+        double speedRpm = speed * SPEED_FACTOR;
         double circumference = 2 * Math.PI * WHEEL_RADIUS;
         double rotations = distance / circumference;
-        double time = rotations * 60 / (speed * WHEEL_DISTANCE);
-        return distance / speed;
+        double time = rotations * 60 / speedRpm; // time in seconds
+        return time;
     }
     
     private static void turnOnUnderlights() {
@@ -277,4 +311,44 @@ public class SwiftbotDrawingProgram {
         return side1 + side2 + side3;
     }
     
+    private static void moveWheelsFwd(int time, int speed) {
+        int leftVelocity = speed;
+        int rightVelocity = speed;
+        try {
+            swiftBot.move(leftVelocity, rightVelocity, time * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private static void rotateSwitftbot(double angle, int speed) {
+        // Conver angle from degrees to radians
+        double theta = angle * 180 / (2 * Math.PI);
+
+        // Calcualte the arc length
+        double arcLength = WHEEL_RADIUS * theta / 2; 
+
+        // Calculate the time in milliseconds required to move "arcLength" distance
+        int time = (int)calculateTime(arcLength, speed) * 1000;
+        
+        if(angle > 0) {
+            int leftVelocity = -speed;
+            int rightVelocity = speed;
+            try {
+                swiftBot.move(leftVelocity, rightVelocity, time);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        } else {
+            int leftVelocity = speed;
+            int rightVelocity = -speed;
+            try {
+                swiftBot.move(leftVelocity, rightVelocity, time);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
 }
