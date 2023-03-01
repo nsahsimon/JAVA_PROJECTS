@@ -100,6 +100,8 @@ public class SwiftbotDrawingProgram {
         moveWheelsFwd((int)time, (int)LOW_SPEED);
         rotateSwitftbot(90, (int)LOW_SPEED);
         moveWheelsFwd((int)time, (int)LOW_SPEED);
+        System.out.println("Stopping wheels and turning underlights to green...");
+        turnOnGreenUnderLights();
         
         // Update the DRAWN_SHAPES, largestSize, and largestShape variables
         DRAWN_SHAPES.add("Square: " + sideLength);
@@ -152,21 +154,21 @@ public class SwiftbotDrawingProgram {
         // Move the wheels to draw the triangle
         // Placeholder values for the Swiftbot commands
         System.out.printf("Drawing triangle with sides %.0f, %.0f, %.0f for %.2f seconds.%n", side1, side2, side3, time);
-        System.out.println("Moving wheels forward at low speed...");
-        System.out.println("Turning wheels to make a left turn...");
-        System.out.println("Moving wheels forward at low speed...");
-        System.out.println("Turning wheels to make a right turn...");
-        System.out.println("Moving wheels forward at low speed...");
-        System.out.println("Turning wheels to make a left turn...");
-        System.out.println("Moving wheels forward at low speed...");
-
+        // System.out.println("Moving wheels forward at low speed...");
+        // System.out.println("Turning wheels to make a left turn...");
+        // System.out.println("Moving wheels forward at low speed...");
+        // System.out.println("Turning wheels to make a right turn...");
+        // System.out.println("Moving wheels forward at low speed...");
+        // System.out.println("Turning wheels to make a left turn...");
+        // System.out.println("Moving wheels forward at low speed...");
         moveWheelsFwd((int)calculateTime(side1 , LOW_SPEED) * 1000, (int)LOW_SPEED);
         rotateSwitftbot(angle3, (int)LOW_SPEED);
         moveWheelsFwd((int)calculateTime(side2 , LOW_SPEED) * 1000, (int)LOW_SPEED);
         rotateSwitftbot(angle1, (int)LOW_SPEED);
         moveWheelsFwd((int)calculateTime(side3 , LOW_SPEED) * 1000, (int)LOW_SPEED);
-        
         System.out.println("Stopping wheels and turning underlights to green...");
+        turnOnGreenUnderLights();
+
         System.out.println("Triangle drawn.");
         System.out.println();
     }
@@ -302,10 +304,21 @@ public class SwiftbotDrawingProgram {
         return time;
     }
     
-    private static void turnOnUnderlights() {
-        // simulate turning on the underlights by printing a message
-        System.out.println("Bottom LEDs turned on to green.");
-    }
+    private static void turnOnGreenUnderLights() {
+		try {
+
+			// turns all green lights on with max brightness
+			swiftBot.fillUnderlights(0, 255, 0, false);
+			swiftBot.updateUnderlights();
+			Thread.sleep(2000);
+
+			// turns off all lights
+			swiftBot.disableUnderlights();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
     
     private static double calculateTrianglePerimeter(double side1, double side2, double side3) {
         return side1 + side2 + side3;
