@@ -93,13 +93,13 @@ public class SwiftbotDrawingProgram {
         
         // Move the wheels at low speed for the calculated time to draw the square
         // Swiftbot.moveWheels(LOW_SPEED, LOW_SPEED, (int) (time * 1000));
-        moveWheelsFwd((int)(time / 4), (int)LOW_SPEED);
+        moveWheelsFwd((int)time, (int)LOW_SPEED);
         rotateSwitftbot(90, (int)LOW_SPEED);
-        moveWheelsFwd((int)(time / 4), (int)LOW_SPEED);
+        moveWheelsFwd((int)time, (int)LOW_SPEED);
         rotateSwitftbot(90, (int)LOW_SPEED);
-        moveWheelsFwd((int)(time / 4), (int)LOW_SPEED);
+        moveWheelsFwd((int)time, (int)LOW_SPEED);
         rotateSwitftbot(90, (int)LOW_SPEED);
-        moveWheelsFwd((int)(time / 4), (int)LOW_SPEED);
+        moveWheelsFwd((int)time, (int)LOW_SPEED);
         System.out.println("Stopping wheels and turning underlights to green...");
         turnOnGreenUnderLights();
         
@@ -122,9 +122,6 @@ public class SwiftbotDrawingProgram {
             side2 = getTriangleSideLength("Enter the length of the second side:");
             side3 = getTriangleSideLength("Enter the length of the third side:");
             validTriangle = canFormTriangle(side1, side2, side3);
-            if(validTriangle){
-                break;
-            }
             tries++;
         }
         if (!validTriangle) {
@@ -164,11 +161,11 @@ public class SwiftbotDrawingProgram {
         // System.out.println("Moving wheels forward at low speed...");
         // System.out.println("Turning wheels to make a left turn...");
         // System.out.println("Moving wheels forward at low speed...");
-        moveWheelsFwd((int)calculateTime(side1 , LOW_SPEED) , (int)LOW_SPEED);
-        rotateSwitftbot(180-angle3, (int)LOW_SPEED);
-        moveWheelsFwd((int)calculateTime(side2 , LOW_SPEED) , (int)LOW_SPEED);
-        rotateSwitftbot(180-angle1, (int)LOW_SPEED);
-        moveWheelsFwd((int)calculateTime(side3 , LOW_SPEED) , (int)LOW_SPEED);
+        moveWheelsFwd((int)calculateTime(side1 , LOW_SPEED) * 1000, (int)LOW_SPEED);
+        rotateSwitftbot(angle3, (int)LOW_SPEED);
+        moveWheelsFwd((int)calculateTime(side2 , LOW_SPEED) * 1000, (int)LOW_SPEED);
+        rotateSwitftbot(angle1, (int)LOW_SPEED);
+        moveWheelsFwd((int)calculateTime(side3 , LOW_SPEED) * 1000, (int)LOW_SPEED);
         System.out.println("Stopping wheels and turning underlights to green...");
         turnOnGreenUnderLights();
 
